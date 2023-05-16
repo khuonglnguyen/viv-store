@@ -1,0 +1,531 @@
+﻿@using SourceCode.Models;
+@model Product
+@{ ViewBag.Title = Model.Name;
+    Layout = "~/Views/Layout/ProductDetailsLayout.cshtml"; }
+@{ IEnumerable<Product> products = ViewBag.ListProduct as IEnumerable<Product>;
+    IEnumerable<QA> qAs = ViewBag.CommentQA as IEnumerable<QA>;
+    IEnumerable<Rating> ratings = ViewBag.ListRating as IEnumerable<Rating>;
+    User user = Session["User"] as User;
+    int counter = 1; }
+<script src="~/Scripts/bootbox.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#Textarea1').change(function () {
+            $('#content').val($(this).val());
+        });
+        $('#Textarea2').change(function () {
+            $('#content2').val($(this).val());
+        });
+        $(".btnPost").on("click", function () {
+            $("#Textarea1").val("");
+            $("#Textarea2").val("");
+        });
+        $('.AddItemCart').click(function (e) {
+            var id = $(this).attr("data-id");
+            $.ajax({
+                method: "POST",
+                url: "/Cart/CheckQuantityAdd",
+                data: {
+                    id: id
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        $.ajax({
+                            method: "POST",
+                            url: "/Cart/AddItemCart",
+                            data: {
+                                id: id
+                            },
+                            dataType: 'html',
+                            success: function (response) {
+                                $.notify("Đã thêm sản phẩm vào giỏ hàng!", "success");
+                                $("#DivCart").html(response);
+                            }
+                        });
+                    }
+                    else {
+                        $.notify("Số lượng sản phẩm đã hết!", "warn");
+                    }
+                }
+            });
+        });
+        $('.btnEdit').on('click', function () {
+            var id = $(this).val();
+            $('#modalUpdate').modal('show');
+            $.ajax({
+                url: '/Product/GetDataQuesion',
+                data: {
+                    id: id
+                },
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        $('#ID').val(response.ID);
+                        $('#Question').val(response.Question);
+                        $('#ProductID').val(response.ProductID);
+                    }
+                    else {
+                        bootbox.alert(response.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+        $('#btnSave').off('click').on('click', function () {
+            $('#modalUpdate').modal('hide');
+        });
+    });
+</script>
+<!--banner-->
+<div class="banner" hidden="hidden">
+    <div class="container">
+        <div class="banner-text">
+            <div class="col-sm-5 banner-left wow fadeInLeft animated" data-wow-delay=".5s">
+                <h2>Chương Trình Ưu Đãi Đặc Biệt</h2>
+                <h3>Sắp diễn ra </h3>
+                <h4>Sẽ bắt đầu sau</h4>
+                <div class="count main-row">
+                    <ul id="example">
+                        <li><span class="hours">00</span><p class="hours_text">Hours</p></li>
+                        <li><span class="minutes">00</span><p class="minutes_text">Minutes</p></li>
+                        <li><span class="seconds">00</span><p class="seconds_text">Seconds</p></li>
+                    </ul>
+                    <div class="clearfix"> </div>
+                    <script type="text/javascript" src="~/Content/js/jquery.countdown.min.js"></script>
+                    <script type="text/javascript">
+                        $('#example').countdown({
+                            date: '12/24/2020 15:59:59',
+                            offset: -8,
+                            day: 'Day',
+                            days: 'Days'
+                        }, function () {
+                            //alert('Done!');
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="col-sm-7 banner-right wow fadeInRight animated" data-wow-delay=".5s">
+                <section class="slider grid">
+                    <div class="flexslider">
+                        <ul class="slides">
+                            <li>
+                                <h4>-30%</h4>
+                                <img src="~/Content/images/b1.png" alt="">
+                            </li>
+                            <li>
+                                <h4>-25%</h4>
+                                <img src="~/Content/images/b2.png" alt="">
+                            </li>
+                            <li>
+                                <h4>-32%</h4>
+                                <img src="~/Content/images/b3.png" alt="">
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                <!--FlexSlider-->
+                <script defer src="~/Content/js/jquery.flexslider.js"></script>
+                <script type="text/javascript">
+                    $(window).load(function () {
+                        $('.flexslider').flexslider({
+                            animation: "pagination",
+                            start: function (slider) {
+                                $('body').removeClass('loading');
+                            }
+                        });
+                    });
+                </script>
+                <!--End-slider-script-->
+            </div>
+            <div class="clearfix"> </div>
+        </div>
+    </div>
+</div>
+<!--//banner-->
+<!--breadcrumbs-->
+<div class="breadcrumbs">
+    <div class="container">
+        <ol class="breadcrumb breadcrumb1 animated wow slideInLeft" data-wow-delay=".5s">
+            <li><a href="index.html"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>Trang Chủ</a></li>
+            <li class="active">Sản Phẩm</li>
+        </ol>
+    </div>
+</div>
+<!--//breadcrumbs-->
+<!--single-page-->
+<div class="single">
+    <div class="container">
+        <div class="single-info">
+            <div class="col-md-6 single-top wow fadeInLeft animated" data-wow-delay=".5s">
+                <div class="flexslider">
+                    <ul class="slides">
+                        <li data-thumb="@Url.Content("~/Content/images/" + Model.Image1)">
+                            <div class="thumb-image"> <img src="@Url.Content("~/Content/images/" + Model.Image1)" data-imagezoom="true" class="img-responsive" alt=""> </div>
+                        </li>
+                        @if (Model.Image2 != null)
+                        {
+                            <li data-thumb="@Url.Content("~/Content/images/" + Model.Image2)">
+                                <div class="thumb-image"> <img src="@Url.Content("~/Content/images/" + Model.Image2)" data-imagezoom="true" class="img-responsive" alt=""> </div>
+                            </li>}
+                        @if (Model.Image3 != null)
+                        {
+                            <li data-thumb="@Url.Content("~/Content/images/" + Model.Image3)">
+                                <div class="thumb-image"> <img src="@Url.Content("~/Content/images/" + Model.Image3)" data-imagezoom="true" class="img-responsive" alt=""> </div>
+                            </li>}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 single-top-left simpleCart_shelfItem wow fadeInRight animated" data-wow-delay=".5s">
+                <h3>@Model.Name</h3>
+                <div class="single-rating">
+                    <div class="rating">
+                        @for (int i = 1; i <= ViewBag.Rating; i++)
+                        {
+                            if (i <= ViewBag.Rating)
+                            {
+                                <span class="on">☆</span>
+                            }
+                            else
+                            {
+                                <span>☆</span>
+                            }
+                        }
+                    </div>
+                    @if (@ViewBag.Rating <= 0)
+                    {
+                        <p>Chưa có đánh giá</p>
+                    }
+                    <a href="#">Đánh giá sau khi mua hàng</a>
+                </div>
+                @if (Model.PromotionPrice < Model.Price)
+                {
+                    <p class="pric1"><del>@Model.Price.ToString("#,##")₫</del></p>
+                }
+                <h6 class="item_price">@Model.PromotionPrice.ToString("#,##")₫</h6>
+                <div class="clearfix"> </div>
+                <div class="quantity">
+                    <p class="qty"> Lượt xem :</p> @Model.ViewCount
+                </div>
+                <div class="quantity">
+                    <p class="qty"> Thương Hiệu :</p> @Model.Producer.Name
+                </div>
+                <div class="quantity">
+                    <p class="qty"> Lứa Tuổi :</p> @Model.Age.Name
+                </div>
+                <div class="quantity">
+                    <p class="qty"> Kho :</p> @Model.Quantity
+                </div>
+                <div class="quantity">
+                    <p class="qty"> Đã bán :</p> @Model.PurchasedCount
+                </div>
+                <div class="btn_form">
+                    <a class="AddItemCart" data-id="@Model.ID" style="cursor:pointer">Thêm vào giỏ</a>
+                </div>
+            </div>
+            <div class="clearfix"> </div>
+        </div>
+        <!--collapse-tabs-->
+        <div class="collpse tabs">
+            <div class="panel-group collpse" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default wow fadeInUp animated" data-wow-delay=".5s">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Mô tả
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            @Model.Description
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default wow fadeInUp animated" data-wow-delay=".6s">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                @if (ratings.Count() > 0)
+                                {
+                                    <span>Đánh Giá (@ratings.Count())</span> }
+                                else
+                                {
+                                    <span>Đánh Giá</span>}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                            @if (ratings.Count() > 0)
+                            {
+                                foreach (var item in ratings)
+                                {
+                                    <label style="color:black">@item.User.FullName</label>
+                                    <div class="rating" style="float:right">
+                                        @for (int i = 1; i <= item.Star; i++)
+                                        {
+                                            if (i <= item.Star)
+                                            {
+                                                <span class="on">☆</span>
+                                            }
+                                            else
+                                            {
+                                                <span>☆</span>
+                                            }
+                                        }
+                                    </div> <br />
+                                    <p style="background-color:lightgrey;color:black;">
+                                        @item.Content
+                                    </p>
+                                    <hr />
+                                }
+                            }
+                            else
+                            {
+                                <p>Chưa có đánh giá</p>}
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default wow fadeInUp animated" data-wow-delay=".7s">
+                    <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
+                            @if (qAs.Count() > 0)
+                            {
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Hỏi Đáp (@qAs.Count())
+                                </a> }
+                            else
+                            {
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Hỏi Đáp
+                                </a>}
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="panel-body">
+                            @if (Session["User"] != null)
+                            {
+                                using (Ajax.BeginForm("AddQuestion", "Product", new AjaxOptions
+                                {
+                                    InsertionMode = InsertionMode.Replace,
+                                    HttpMethod = "GET",
+                                    LoadingElementId = "ajax-loader",
+                                    UpdateTargetId = "qaContainer",
+
+                                }))
+                                {
+                                    <input value="@user.ID" hidden="hidden" name="userID" />
+                                    <input value="@Model.ID" hidden="hidden" name="productID" />
+                                    <div class="form-group mx-sm-3 mb-2">
+                                        <label for="inputPassword2" class="sr-only">Nội dung câu hỏi</label>
+                                        <textarea class="form-control" id="Textarea2" style="resize:none" rows="3" placeholder="Viết câu hỏi tại đây..."></textarea>
+                                    </div>
+                                    <input type="text" name="Question" id="content2" hidden="hidden" required />
+                                    <button type="submit" class="btn btn-warning btnPost">Đăng Câu Hỏi</button>
+                                    <img id="ajax-loader"
+                                         src="@Url.Content("~/Content/images/loading.gif")"
+                                         style="display:none" /> }
+                                <div class="ajax-loader"></div> }
+                            else
+                            {
+                                <a class="btn btn-warning btnPost" href="@Url.Action("SignIn","Home")">Đăng nhập để đăng câu hỏi</a>}
+                            <div id="qaContainer">
+                                <hr />
+                                @if (qAs.Count() > 0)
+                                {
+                                    foreach (var item in qAs)
+                                    {
+                                        <label style="color:black">@item.User1.FullName:</label> @item.DateQuestion
+                                        <p style="color:black">@item.Question</p> if (item.Answer != null)
+                                        {
+                                            <div style="background-color:lightgray">
+                                                <p><label style="color:brown">@item.User.FullName  <span class="label label-warning">@item.User.UserType.Name</span> </label>  @item.DateAnswer</p>
+                                                <p style="color:black">@item.Answer</p>
+                                            </div> }
+                                        <p>
+                                            @if (user != null && item.UserAskID == user.ID)
+                                            {
+                                                using (Ajax.BeginForm("DeleteQA", "Product", new AjaxOptions
+                                                {
+                                                    InsertionMode = InsertionMode.Replace,
+                                                    HttpMethod = "GET",
+                                                    LoadingElementId = "ajax-loader",
+                                                    UpdateTargetId = "qaContainer",
+                                                }))
+                                                {
+                                                    <input type="text" name="ID" value="@item.ID" hidden="hidden" />
+                                                    <input type="text" name="ProductID" value="@item.ProductID" hidden="hidden" />
+                                                    <button>Xóa</button> }
+                                                <div class="ajax-loader"></div>
+                                            }
+                                        </p>
+                                        <p>
+                                            @if (item.Answer == null && user != null)
+                                            {
+                                                if (item.UserAskID == user.ID)
+                                                {
+                                                    <button class="btnEdit" value="@item.ID" data-productid="@item.ProductID">Sửa</button>}
+                                            }
+                                        </p>
+                                        <hr /> }
+                                }
+                                else
+                                {
+                                    <p>Chưa có câu hỏi nào</p>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--//collapse -->
+        <!--related-products-->
+        <div class="related-products">
+            <div class="title-info wow fadeInUp animated" data-wow-delay=".5s">
+                <h3 class="title">Sản Phẩm<span> Cùng Loại</span></h3>
+            </div>
+            <div class="related-products-info">
+                @foreach (var item in products)
+                {
+                    if (counter == 1)
+                    {
+                        <div class="col-md-3 new-grid simpleCart_shelfItem wow flipInY animated" data-wow-delay=".5s">
+                            <div class="new-top">
+                                <a href="/san-pham/@item.SEOKeyword-@item.ID"><img src="@Url.Content("~/Content/images/"+item.Image1)" style="height:250px;width:300px" class="img-responsive" alt="" /></a>
+                                <div class="new-text">
+                                    <ul>
+                                        <li>
+                                            <a class="AddItemCart" data-id="@Model.ID" style="cursor:pointer">Thêm vào giỏ</a>
+                                        </li>
+                                        <li><a href="/san-pham/@item.SEOKeyword-@item.ID">Xem Chi Tiết </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="new-bottom">
+                                <h5><a class="name" href="/san-pham/@item.SEOKeyword-@item.ID" style="width: 200px;display: inline-block;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">@item.Name </a></h5>
+                                <div class="ofr">
+                                    @if (item.Discount > 0)
+                                    {
+                                        <p class="pric1"><del>@item.Price.ToString("#,##")₫</del></p><br />
+                                    }
+                                    <p><span class="item_price">@item.PromotionPrice.ToString("#,##")₫</span></p>
+                                </div>
+                            </div>
+                        </div> counter++;
+                    }
+                    else if (counter == 2)
+                    {
+                        <div class="col-md-3 new-grid new-mdl simpleCart_shelfItem wow flipInY animated" data-wow-delay=".7s">
+                            <div class="new-top">
+                                <a href="/san-pham/@item.SEOKeyword-@item.ID"><img src="@Url.Content("~/Content/images/"+item.Image1)" style="height:250px;width:300px" class="img-responsive" alt="" /></a>
+                                <div class="new-text">
+                                    <ul>
+                                        <li>
+                                            <a class="AddItemCart" data-id="@Model.ID" style="cursor:pointer">Thêm vào giỏ</a>
+                                        </li>
+                                        <li><a href="/san-pham/@item.SEOKeyword-@item.ID">Xem Chi Tiết </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="new-bottom">
+                                <h5><a class="name" href="/san-pham/@item.SEOKeyword-@item.ID" style="width: 200px;display: inline-block;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">@item.Name </a></h5>
+                                <div class="ofr">
+                                    @if (item.Discount > 0)
+                                    {
+                                        <p class="pric1"><del>@item.Price.ToString("#,##")₫</del></p><br />
+                                    }
+                                    <p><span class="item_price">@item.PromotionPrice.ToString("#,##")₫</span></p>
+                                </div>
+                            </div>
+                        </div> counter++;
+                    }
+                    else if (counter == 3)
+                    {<div class="col-md-3 new-grid new-mdl1 simpleCart_shelfItem wow flipInY animated" data-wow-delay=".9s">
+                            <div class="new-top">
+                                <a href="/san-pham/@item.SEOKeyword-@item.ID"><img src="@Url.Content("~/Content/images/"+item.Image1)" style="height:250px;width:300px" class="img-responsive" alt="" /></a>
+                                <div class="new-text">
+                                    <ul>
+                                        <li>
+                                            <a class="AddItemCart" data-id="@Model.ID" style="cursor:pointer">Thêm vào giỏ</a>
+                                        </li>
+                                        <li><a href="/san-pham/@item.SEOKeyword-@item.ID">Xem Chi Tiết </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="new-bottom">
+                                <h5><a class="name" href="/san-pham/@item.SEOKeyword-@item.ID" style="width: 200px;display: inline-block;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">@item.Name </a></h5>
+                                <div class="ofr">
+                                    @if (item.Discount > 0)
+                                    {
+                                        <p class="pric1"><del>@item.Price.ToString("#,##")₫</del></p><br />
+                                    }
+                                    <p><span class="item_price">@item.PromotionPrice.ToString("#,##")₫</span></p>
+                                </div>
+                            </div>
+                        </div> counter++;
+                    }
+                    else if (counter == 4)
+                    {
+                        <div class="col-md-3 new-grid simpleCart_shelfItem wow flipInY animated" data-wow-delay="1.1s">
+                            <div class="new-top">
+                                <a href="/san-pham/@item.SEOKeyword-@item.ID"><img src="@Url.Content("~/Content/images/"+item.Image1)" style="height:250px;width:300px" class="img-responsive" alt="" /></a>
+                                <div class="new-text">
+                                    <ul>
+                                        <li>
+                                            <a class="AddItemCart" data-id="@Model.ID" style="cursor:pointer">Thêm vào giỏ</a>
+                                        </li>
+                                        <li><a href="/san-pham/@item.SEOKeyword-@item.ID">Xem Chi Tiết </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="new-bottom">
+                                <h5><a class="name" href="/san-pham/@item.SEOKeyword-@item.ID" style="width: 200px;display: inline-block;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">@item.Name </a></h5>
+                                <div class="ofr">
+                                    @if (item.Discount > 0)
+                                    {
+                                        <p class="pric1"><del>@item.Price.ToString("#,##")₫</del></p><br />
+                                    }
+                                    <p><span class="item_price">@item.PromotionPrice.ToString("#,##")₫</span></p>
+                                </div>
+                            </div>
+                        </div>break;
+                    }
+                }
+                <div class="clearfix"> </div>
+            </div>
+        </div>
+        <!--//related-products-->
+    </div>
+</div>
+<!--//single-page-->
+<div class="modal fade" id="modalUpdate" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chỉnh sửa</h4>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("EditQuestion", "Product", FormMethod.Post))
+                {
+                    <input type="text" name="ID" id="ID" hidden="hidden" />
+                    <input type="text" name="ProductID" id="ProductID" hidden="hidden" />
+                    <input type="text" name="page" value="@ViewBag.Page" hidden="hidden" />
+                    <div class="form-group">
+                        <label for="Name">Câu hỏi:</label>
+                        <input type="text" class="form-control" name="Question" id="Question">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btnSave" id="btnSave">Lưu</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

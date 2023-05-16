@@ -1,0 +1,127 @@
+﻿@{
+    List<SourceCode.Models.ItemCart> Cart = Session["Cart"] as List<SourceCode.Models.ItemCart>;
+    SourceCode.Models.User User = Session["User"] as SourceCode.Models.User;
+    List<SourceCode.Models.UserDiscountCode> userDiscountCodes = ViewBag.DiscountCodeDetailListByUser as List<SourceCode.Models.UserDiscountCode>;
+}
+@if (Cart.Count > 0)
+{
+    <h3 class="wow fadeInUp animated" data-wow-delay=".5s">Giỏ Hàng Của Bạn Có: @ViewBag.TotalQuantity Sản Phẩm</h3>
+    foreach (var item in Cart)
+    {
+        <div class="cart-header wow fadeInUp animated" data-wow-delay=".5s">
+            <div style="text-align:right">
+                <button class="btn btn-group btnEdit" value="@item.ProductID">
+                    <i class="fa fa-pencil"></i>
+                </button>
+                <button class="btn btn-danger btnDelete" value="@item.ProductID">
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+            <div class="cart-sec simpleCart_shelfItem">
+                <div class="cart-item cyc">
+                    <a href="single.html"><img src="@Url.Content("~/Content/images/" + item.Image)" class="img-responsive" alt=""></a>
+                </div>
+                <div class="cart-item-info">
+                    <h4><a href="single.html"> @item.Name </a></h4>
+                    <ul class="qty">
+                        <li><p>Số lượng:@item.Quantity</p></li>
+                        <li><p>Đơn giá: @item.Price.ToString("#,##")₫</p></li>
+                        <li><p>Thành tiền: @item.Total.ToString("#,##")₫</p></li>
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    }
+    if (Session["User"] == null)
+    {
+        <div class="login-page">
+            <div class="title-info wow fadeInUp animated" data-wow-delay=".5s">
+                <h3 class="title">Thêm Mới Thông Tin Đặt Hàng</h3>
+            </div>
+            <div class="widget-shadow">
+                <div class="login-top wow fadeInUp animated" data-wow-delay=".7s">
+                    <h4>Đăng nhập để mua hàng nhanh chóng <br> Bạn chưa có tài khoản? <a href="@Url.Action("SignUp","Home")">  Đăng Ký Ngay »</a> </h4>
+                </div>
+                <div class="login-body wow fadeInUp animated" data-wow-delay=".7s">
+                    @using (Html.BeginForm("AddOrder", "Cart", FormMethod.Post))
+                    {
+                        <input type="text" class="user" name="FullName" placeholder="Họ tên" required maxlength="50">
+                        <input type="text" name="PhoneNumber" class="user" placeholder="Số điện thoại" pattern=".{10,12}" required title="Số điện thoại phải từ 10 đến 12 số!">
+                        <input type="text" name="Email" class="user" placeholder="Email" required pattern="[a-z0-9._%+-]+&#64;[a-z0-9.-]+\.[a-z]{2,}$" title="Nhập vào đúng đinh dạng mail của bạn (vd: abc@gmail.com)">
+                        <input type="text" name="Address" class="user" placeholder="Địa chỉ nhận hàng" required maxlength="200">
+                        if (Session["num"] != null)
+                        {
+                            <label>Mã giảm giá</label><br />
+                            <input type="text" name="NumberDiscount" class="user" value="@Session["Code"] (-@Session["num"]%)" readonly>
+                            <input type="text" name="NumberDiscountPass" hidden="hidden" value="@Session["num"]">
+                            <input type="text" name="CodePass" hidden="hidden" value="@Session["Code"]">
+                            <input type="button" value="Chọn mã Code khác" id="btnChoose" />
+                            @Html.ActionLink("Bỏ chọn mã giảm giá", "CancelDiscount")<br />
+                            decimal total = @Cart.Sum(x => x.Total) - (@Cart.Sum(x => x.Total) / 100 * (int)@Session["num"]);
+                            <label>Thành tiền</label><br />
+                            <del>@Cart.Sum(x => x.Total).ToString("#,##")₫</del>
+                            <h4 style="color:brown">@total.ToString("#,##")₫</h4>
+                        }
+                        else
+                        {
+                            <label>Mã giảm giá (nếu có)</label><br />
+                            <input type="button" value="Chọn mã Code" id="btnChoose" /><br />
+                            <label>Thành tiền</label>
+                            <h4 style="color:brown">@Cart.Sum(x => x.Total).ToString("#,##")₫</h4>
+                        }
+                        <input type="submit" name="Sign In" value="Tiến Hành Đặt Hàng">
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="login-page">
+            <div class="title-info wow fadeInUp animated" data-wow-delay=".5s">
+                <h3 class="title">Thông Tin Đặt Hàng</h3>
+            </div>
+            <div class="widget-shadow">
+                <div class="login-body wow fadeInUp animated" data-wow-delay=".7s">
+                    @using (Html.BeginForm("AddOrder", "Cart", FormMethod.Post))
+                    {
+                        <label>Họ tên</label>
+                        <input type="text" class="user" name="FullName" value="@User.FullName" readonly>
+                        <label>Số điện thoại</label>
+                        <input type="text" name="PhoneNumber" class="user" value="@User.PhoneNumber" readonly>
+                        <label>Email</label>
+                        <input type="text" name="Email" class="user" value="@User.Email" readonly>
+                        <label>Địa chỉ nhận hàng</label>
+                        <input type="text" name="Address" class="user" value="@User.Address" readonly>
+                        if (Session["num"] != null)
+                        {
+                            <label>Mã giảm giá</label><br />
+                            <input type="text" name="NumberDiscount" class="user" value="@Session["Code"] (-@Session["num"]%)" readonly>
+                            <input type="text" name="NumberDiscountPass" hidden="hidden" value="@Session["num"]">
+                            <input type="text" name="CodePass" hidden="hidden" value="@Session["Code"]">
+                            <input type="button" value="Chọn mã Code khác" id="btnChoose" />
+                            @Html.ActionLink("Bỏ chọn mã giảm giá", "CancelDiscount")<br />
+                            decimal total = @Cart.Sum(x => x.Total) - (@Cart.Sum(x => x.Total) / 100 * (int)@Session["num"]);
+                            <label>Thành tiền</label><br />
+                            <del>@Cart.Sum(x => x.Total).ToString("#,##")₫</del>
+                            <h4 style="color:brown">@total.ToString("#,##")₫</h4>
+                        }
+                        else
+                        {
+                            <label>Mã giảm giá (nếu có)</label><br />
+                            <input type="button" value="Chọn mã Code" id="btnChoose" /><br />
+                            <label>Thành tiền</label>
+                            <h4 style="color:brown">@Cart.Sum(x => x.Total).ToString("#,##")₫</h4>
+                        }
+                        <input type="submit" name="Sign In" value="Tiến Hành Đặt Hàng">
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <h3 class="wow fadeInUp animated" data-wow-delay=".5s">Giỏ Hàng Của Bạn Hiện Đang Trống</h3>
+}

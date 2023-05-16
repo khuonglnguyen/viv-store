@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="8a73b1e741ea44b2bdf02fdcd2acf02d" Name="Diagram1">
+        <EntityTypeShape EntityType="ShopPhuKienModel.AccessTimesCount" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Age" Width="1.5" PointX="5.75" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Decentralization" Width="1.5" PointX="3" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.DiscountCode" Width="1.5" PointX="5.25" PointY="15.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.DiscountCodeDetail" Width="1.5" PointX="7.5" PointY="15.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Gender" Width="1.5" PointX="5.75" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.ImportCoupon" Width="1.5" PointX="5.25" PointY="20.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.ImportCouponDetail" Width="1.5" PointX="7.5" PointY="18.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.ItemCart" Width="1.5" PointX="8.25" PointY="22.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Message" Width="1.5" PointX="5.25" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Order" Width="1.5" PointX="5.25" PointY="27.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.OrderDetail" Width="1.5" PointX="7.5" PointY="28.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Producer" Width="1.5" PointX="5.75" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.ProductCategory" Width="1.5" PointX="5.75" PointY="11" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.ProductCategoryParent" Width="1.5" PointX="3.5" PointY="11.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Product" Width="1.5" PointX="8" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.ProductViewed" Width="1.5" PointX="8.25" PointY="25.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.QA" Width="1.5" PointX="11.25" PointY="21.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Rating" Width="1.5" PointX="10.25" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Role" Width="1.5" PointX="0.75" PointY="14.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.Supplier" Width="1.5" PointX="3" PointY="26" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.User" Width="1.5" PointX="3" PointY="18.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.UserDiscountCode" Width="1.5" PointX="9.75" PointY="18.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.UsersSpin" Width="1.5" PointX="5.25" PointY="42.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShopPhuKienModel.UserType" Width="1.5" PointX="0.75" PointY="17.625" IsExpanded="true" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Products_dbo_Ages_AgeID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Decentralization_dbo_Role_RoleID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_Decentralization_UserType" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_DiscountCode_User" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_DiscountCodeDetail_DiscountCode" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_UserDiscountCode_DiscountCodeDetail" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Products_dbo_Gender_GenderID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ImportCoupon_dbo_Supplier_SupplierID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ImportCoupon_dbo_User_UserID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ImportCouponDetail_dbo_ImportCoupon_ImportCouponID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ImportCouponDetail_dbo_Products_ProductID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Cart_dbo_Products_ProductID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Cart_dbo_User_UserID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK__Message__FromUse__6D0D32F4" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK__Message__ToUserI__6E01572D" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK__Order__UserID__6EF57B66" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_OrderDetail_dbo_Order_OrderID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_OrderDetail_dbo_Products_ProductID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Products_dbo_Producer_ProducerID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ProductCategory_dbo_ProductCategoryParent_ParentID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Products_dbo_ProductCategory_CategoryID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ProductViewed_dbo_Products_ProductID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_QA_dbo_Products_ProductID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Rating_dbo_Products_ProductID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_ProductViewed_dbo_User_UserID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK__QA__UserAnswerID__787EE5A0" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK__QA__UserAskID__797309D9" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_Rating_dbo_User_UserID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK__UsersSpin__UserI__00200768" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_dbo_User_dbo_UserType_UserTypeID" ManuallyRouted="false" />
+        <AssociationConnector Association="ShopPhuKienModel.FK_UserDiscountCode_User" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

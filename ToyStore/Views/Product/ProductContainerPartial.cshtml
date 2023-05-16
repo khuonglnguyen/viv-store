@@ -1,0 +1,12 @@
+﻿
+@model PagedList.IPagedList<SourceCode.Models.Product>
+@using PagedList.Mvc;
+@{
+    int couter = 1;
+}
+
+<div class="clearfix"></div>
+<br />
+<div id='Paging' style="text-align: right">
+    @Html.PagedListPager(Model, page => Url.Action("FilterProductList", new { type = ViewBag.Type, ID = ViewBag.ID, min = ViewBag.Min, max = ViewBag.Max, page }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "ProductContainer" }))
+</div>

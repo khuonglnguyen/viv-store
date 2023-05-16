@@ -1,0 +1,542 @@
+﻿@model PagedList.IPagedList<SourceCode.Models.Product>
+@using PagedList.Mvc;
+@{ ViewBag.Title = "Danh sách sản phẩm";
+    Layout = "~/Views/Layout/AdminLayout.cshtml"; }
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="~/Scripts/bootbox.js"></script>
+@if (TempData["create"] != null)
+{
+    <script>
+        swal({
+            title: "Thông báo",
+            text: "Thêm sản phẩm thành công!",
+            icon: "success",
+            timer: 1500
+        });
+    </script> @(TempData["create"] = null)}
+@if (TempData["edit"] != null)
+{
+    <script>
+        swal({
+            title: "Thông báo",
+            text: "Cập nhật sản phẩm thành công!",
+            icon: "success",
+            timer: 1500
+        });
+    </script> @(TempData["edit"] = null)}
+<script>
+    $(document).ready(function () {
+        $(".ckb").change(function () {
+            var id = $(this).prop("value");
+            if ($(this).is(':checked')) {
+                $.ajax({
+                    url: '/ProductManage/Active',
+                    data: {
+                        id: id
+                    }
+                });
+                swal({
+                    title: "Thông báo",
+                    text: "Kích hoạt sản phẩm thành công!",
+                    icon: "success",
+                    timer: 1500
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/ProductManage/Block',
+                    data: {
+                        id: id
+                    }
+                });
+                swal({
+                    title: "Thông báo",
+                    text: "Khóa sản phẩm thành công!",
+                    icon: "success",
+                    timer: 1500
+                });
+            }
+        });
+        $('#btnAddNew').off('click').on('click', function () {
+            $('#modalAdd').modal('show');
+        });
+        $('.btnEdit').off('click').on('click', function () {
+            var id = $(this).val();
+            $('#modalUpdate').modal('show');
+            $.ajax({
+                url: '/ProductManage/Edit',
+                data: {
+                    id: id
+                },
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        $('#ID').val(response.ID);
+                        $('#Name').val(response.Name);
+                        $('#CategoryIDEdit').val(response.CategoryID);
+                        $('#ProducerIDEdit').val(response.ProducerID);
+                        $('#AgeIDEdit').val(response.AgeID);
+                        $('#GenderIDEdit').val(response.GenderID);
+                        $('#TextImage1').val(response.Image1);
+                        $('#TextImage2').val(response.Image2);
+                        $('#TextImage3').val(response.Image3);
+                        $('#img1').attr('src', "/Content/images/" + response.Image1);
+                        $('#img2').attr('src', "/Content/images/" + response.Image2);
+                        $('#img3').attr('src', "/Content/images/" + response.Image3);
+                        $('#Price').val(response.Price);
+                        $('#Discount').val(response.Discount);
+                        $('#Description').val(response.Description);
+                        $('#HomeFlag').prop("checked", response.HomeFlag);
+                        $('#IsActive').prop("checked", response.IsActive);
+                        $('#ViewCount').val(response.ViewCount);
+                        $('#PurchasedCount').val(response.PurchasedCount);
+                        $('#SEOKeyword').val(response.SEOKeyword);
+                    }
+                    else {
+                        bootbox.alert(response.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+        $('.btnDetail').off('click').on('click', function () {
+            var id = $(this).val();
+            $('#modalDetail').modal('show');
+            $.ajax({
+                url: '/ProductManage/Edit',
+                data: {
+                    id: id
+                },
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        $('#NameDetail').val(response.Name);
+                        $('#CategoryIDDetail').val(response.CategoryID);
+                        $('#ProducerIDDetail').val(response.ProducerID);
+                        $('#AgeIDDetail').val(response.AgeID);
+                        $('#GenderIDDetail').val(response.GenderID);
+                        $('#Image1Detail').attr('src', "/Content/images/" + response.Image1);
+                        $('#Image2Detail').attr('src', "/Content/images/" + response.Image2);
+                        $('#Image3Detail').attr('src', "/Content/images/" + response.Image3);
+                        $('#PriceDetail').val(response.Price);
+                        $('#DiscountDetail').val(response.Discount);
+                        $('#DescriptionDetail').val(response.Description);
+                        $('#HomeFlagDetail').prop("checked", response.HomeFlag);
+                        $('#IsActiveDetail').prop("checked", response.IsActive);
+                        $('#ViewCountDetail').val(response.ViewCount);
+                        $('#PurchasedCountDetail').val(response.PurchasedCount);
+                        $('#QuantityDetail').val(response.Quantity);
+                    }
+                    else {
+                        bootbox.alert(response.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+        function checkNameAdd() {
+            var name = $("#NameAdd").val();
+            var status = false;
+            $.ajax({
+                url: '/ProductManage/CheckName',
+                data: {
+                    name: name
+                },
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        status = true;
+                    }
+                },
+                async: false
+            });
+            if (status) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        $(document).on('submit', '#formAdd', function (e) {
+            if (checkNameAdd() == false) {
+                swal({
+                    title: "Thông báo",
+                    text: "Tên sản phẩm đã tồn tại!",
+                    icon: "error"
+                });
+                return false;
+            }
+        });
+        function checkNameEdit() {
+            var name = $("#Name").val();
+            var id = $("#ID").val();
+            var status = false;
+            $.ajax({
+                url: '/ProductManage/CheckName',
+                data: {
+                    name: name,
+                    id: id
+                },
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        status = true;
+                    }
+                },
+                async: false
+            });
+            if (status) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        $(document).on('submit', '#formEdit', function (e) {
+            if (checkNameEdit() == false) {
+                swal({
+                    title: "Thông báo",
+                    text: "Tên sản phẩm đã tồn tại!",
+                    icon: "error"
+                });
+                return false;
+            }
+        });
+        $("#keyword").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/ProductManage/ListName",
+                    type: "POST",
+                    dataType: "json",
+                    data: { Prefix: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item, value: item };
+                        }))
+                    }
+                })
+            },
+            messages: {
+                noResults: "", results: ""
+            }
+        });
+    });
+</script>
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Admin")">Trang chủ</a> <i class="fa fa-angle-right"></i></li>
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","ProductManage")">Sản phẩm</a> <i class="fa fa-angle-right"></i></li>
+</ol>
+<div class="agile-grids">
+    <div class="agile-tables">
+        <div class="w3l-table-info">
+            <ul class="bt-list">
+                <li><a href="#" class="hvr-icon-float-away col-24" style="background-color:green" id="btnAddNew">Thêm mới</a></li>
+            </ul>
+            <hr />
+            <div class="w3-search-box">
+                <form action="~/ProductManage/Index" method="get">
+                    <input type="text" placeholder="Tìm kiếm..." name="keyword" id="keyword" required>
+                    <input type="submit" value="">
+                </form>
+                @if (ViewBag.KeyWord != null)
+                {
+                    <h5>Tìm kiếm với từ khóa "@ViewBag.KeyWord"</h5>}
+            </div><!--//end-search-box-->
+            <p>@ViewBag.message</p>
+            <div class="clearfix"> </div>
+            <hr />
+            <h2>Danh sách sản phẩm</h2>
+            <table id="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Tên sản phẩm
+                        </th>
+                        <th>
+                            Hình ảnh
+                        </th>
+                        <th>
+                            Kích hoạt
+                        </th>
+                        <th>
+                            ngày cập nhật cuối
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @Html.Hidden(item.ID.ToString())
+                        <tr>
+                            <td style="color:brown">
+                                <b>@Html.DisplayFor(modelItem => item.Name)</b>
+                            </td>
+                            <td>
+                                <img src="@Url.Content("~/Content/images/" + item.Image1)" width="100" height="100" />
+                            </td>
+                            <td>
+                                @if (item.IsActive == true)
+                                {
+                                    <label class="switch block">
+                                        <input type="checkbox" checked class="ckb" value="@item.ID">
+                                        <span class="slider round"></span>
+                                    </label> }
+                                else
+                                {
+                                    <label class="switch active">
+                                        <input type="checkbox" class="ckb" value="@item.ID">
+                                        <span class="slider round"></span>
+                                    </label>}
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LastUpdatedDate)
+                            </td>
+                            <td>
+                                <button class="btn btn-link btnDetail" value="@item.ID">Chi tiết</button>
+                                <button class="btn btn-primary btnEdit" value="@item.ID">Sửa</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <br />
+            <div id='Paging' style="text-align: center">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, keyword = ViewBag.KeyWord }))
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalAdd" role="dialog">
+    <div class="modal-dialog">
+        <!--Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Thêm mới</h4>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Create", "ProductManage", FormMethod.Post, new { @enctype = "multipart/form-data", id = "formAdd" }))
+                {
+                    <div class="form-group">
+                        <label for="Name">Tên sản phẩm:</label>
+                        <input type="text" class="form-control" name="Name" id="NameAdd" pattern=".{,50}" required title="Tên sản phẩm tối đa 50 ký tự!">
+                        <input type="text" name="page" value="@ViewBag.Page" hidden="hidden" />
+                        <input type="hidden" id="hidID" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Danh mục:</label>
+                        @Html.DropDownList("CategoryID", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Nhà sản xuất:</label>
+                        @Html.DropDownList("ProducerID", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Độ tuổi:</label>
+                        @Html.DropDownList("AgeID", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Giới tính:</label>
+                        @Html.DropDownList("GenderID", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh 1:</label>
+                        <input type="file" name="ImageUpload" id="Image1Add" required accept="image/png, image/gif, image/jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh 2:</label>
+                        <input type="file" name="ImageUpload" id="Image2Add" accept="image/png, image/gif, image/jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh 3:</label>
+                        <input type="file" name="ImageUpload" id="Image3Add" accept="image/png, image/gif, image/jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Giá bán:</label>
+                        <input type="number" class="form-control" name="Price" id="PriceAdd" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Khuyến mãi(%):</label>
+                        <input type="number" class="form-control" name="Discount" id="DiscountAdd" value="0" min="0" max="99">
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả:</label>
+                        <textarea class="form-control" name="Description" id="DescriptionAdd" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Kích hoạt:</label>
+                        <input class="form-control" data-val="true" id="IsActiveAdd" name="IsActive" type="checkbox" value="true" checked>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="btnSave">Lưu</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                    </div>}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalUpdate" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chỉnh sửa</h4>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Edit", "ProductManage", FormMethod.Post, new { @enctype = "multipart/form-data", id = "formEdit" }))
+                {
+                    <input type="text" name="ID" id="ID" hidden />
+                    <input type="text" name="ViewCount" id="ViewCount" hidden />
+                    <input type="text" name="PurchasedCount" id="PurchasedCount" hidden />
+                    <input type="text" name="CommentCount" id="CommentCount" hidden />
+                    <input type="text" name="SEOKeyword" id="SEOKeyword" hidden />
+                    <input type="text" name="page" value="@ViewBag.Page" hidden="hidden" />
+                    <div class="form-group">
+                        <label for="Name">Tên sản phẩm:</label>
+                        <input type="text" class="form-control" name="Name" id="Name" pattern=".{,50}" required title="Tên sản phẩm tối đa 50 ký tự!">
+                        <input type="hidden" id="hidID" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Danh mục:</label>
+                        @Html.DropDownList("CategoryIDEdit", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Nhà sản xuất:</label>
+                        @Html.DropDownList("ProducerIDEdit", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Độ tuổi:</label>
+                        @Html.DropDownList("AgeIDEdit", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Giới tính:</label>
+                        @Html.DropDownList("GenderIDEdit", null, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh 1:</label>
+                        <input type="text" class="form-control" name="Image1" id="TextImage1" readonly>
+                        <input type="file" name="ImageUpload" id="Image1" accept="image/png, image/gif, image/jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh 2:</label>
+                        <input type="text" class="form-control" name="Image2" id="TextImage2" readonly>
+                        <input type="file" name="ImageUpload" id="Image2" accept="image/png, image/gif, image/jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh 3:</label>
+                        <input type="text" class="form-control" name="Image3" id="TextImage3" readonly>
+                        <input type="file" name="ImageUpload" id="Image3" accept="image/png, image/gif, image/jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Giá bán:</label>
+                        <input type="number" class="form-control" name="Price" id="Price" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Khuyến mãi(%):</label>
+                        <input type="number" class="form-control" name="Discount" id="Discount" min="0" max="99">
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả:</label>
+                        <textarea class="form-control" name="Description" id="Description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Kích hoạt:</label>
+                        <input class="form-control" data-val="true" id="IsActive" name="IsActive" type="checkbox" value="true">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="btnSave">Lưu</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                    </div>}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalDetail" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Xem chi tiết</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" name="page" value="@ViewBag.Page" hidden="hidden" />
+                <div class="form-group">
+                    <label for="Name">Tên sản phẩm:</label>
+                    <input type="text" class="form-control" name="Name" id="NameDetail" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="Name">Số lượng:</label>
+                    <input type="text" class="form-control" name="Name" id="QuantityDetail" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="Name">Lượt xem:</label>
+                    <input type="text" class="form-control" name="Name" id="ViewCountDetail" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="Name">Lượt mua:</label>
+                    <input type="text" class="form-control" name="Name" id="PurchasedCountDetail" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Danh mục:</label>
+                    @Html.DropDownList("CategoryIDDetail", null, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="form-group">
+                    <label>Nhà sản xuất:</label>
+                    @Html.DropDownList("ProducerIDDetail", null, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="form-group">
+                    <label>Độ tuổi:</label>
+                    @Html.DropDownList("AgeIDDetail", null, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="form-group">
+                    <label>Giới tính:</label>
+                    @Html.DropDownList("GenderIDDetail", null, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+                <div class="form-group">
+                    <label>Hình ảnh 1:</label>
+                    <img name="Image" id="Image1Detail" style="height:200px;width:200px" />
+                </div>
+                <div class="form-group">
+                    <label>Hình ảnh 2:</label>
+                    <img name="Image" id="Image2Detail" style="height:200px;width:200px" />
+                </div>
+                <div class="form-group">
+                    <label>Hình ảnh 3:</label>
+                    <img name="Image" id="Image3Detail" style="height:200px;width:200px" />
+                </div>
+                <div class="form-group">
+                    <label>Giá bán:</label>
+                    <input type="number" class="form-control" name="Price" id="PriceDetail" min="0" required readonly>
+                </div>
+                <div class="form-group">
+                    <label>Khuyến mãi(%):</label>
+                    <input type="number" class="form-control" name="Discount" id="DiscountDetail" min="0" max="99" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Mô tả:</label>
+                    <textarea class="form-control" name="Description" id="DescriptionDetail" required readonly></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Kích hoạt:</label>
+                    <input class="form-control" data-val="true" id="IsActiveDetail" name="IsActive" type="checkbox" value="true" readonly>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,141 @@
+﻿@{
+    IEnumerable<SourceCode.Models.ProductCategory> productCategories = ViewBag.ListProductCategory;
+    IEnumerable<SourceCode.Models.Producer> producers = ViewBag.ListProducer;
+    IEnumerable<SourceCode.Models.Age> ages = ViewBag.ListAge;
+    IEnumerable<SourceCode.Models.ProductCategoryParent> productCategoryParents = ViewBag.ListParent;
+    IEnumerable<SourceCode.Models.Gender> genders = ViewBag.ListGender;
+}
+<div class="top-nav navbar navbar-default">
+    <!--header-three-->
+    <div class="container">
+        <nav class="navbar" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!--navbar-header-->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav top-nav-info" style="font-size:15px">
+                    <li><a href="/trang-chu" class="active">Trang Chủ</a></li>
+                    <li><a href="/san-pham-moi">Hàng Mới</a></li>
+                    <li class="dropdown grid">
+                        <a href="#" class="dropdown-toggle list1" data-toggle="dropdown">Danh Mục<b class="caret"></b></a>
+                        <ul class="dropdown-menu multi-column multi-column2">
+                            <div class="row">
+                                @foreach (var item1 in productCategoryParents)
+                                {
+                                    <div class="col-sm-3 menu-grids">
+                                        <a href="/danh-muc-goc/@item1.SeoKeyword-@item1.ID">
+                                            <h4 style="font-size:17px">@item1.Name</h4>
+                                        </a>
+                                        <ul class="multi-column-dropdown">
+                                            @foreach (var item2 in productCategories.Where(x => x.ParentID == item1.ID))
+                                            {
+                                                <li>
+                                                    <a class="list" href="/danh-muc/@item2.SEOKeyword-@item2.ID" style="font-size:17px">@item2.Name</a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                                @*<div class="col-sm-3 menu-grids new-add2">
+                        <a href="products.html">
+                            <h6>Kids Special</h6>
+                            <img src="~/Content/images/img1.jpg" alt="">
+                        </a>
+                    </div>*@
+                                <div class="clearfix"> </div>
+                            </div>
+                        </ul>
+                    </li>
+                    <li class="dropdown grid">
+                        <a href="#" class="dropdown-toggle list1" data-toggle="dropdown">Giới Tính<b class="caret"></b></a>
+                        <ul class="dropdown-menu multi-column multi-column2">
+                            <div class="row">
+                                <div class="col-sm-4 menu-grids">
+                                    <ul class="multi-column-dropdown">
+                                        <li><a class="list" href="/gioi-tinh/be-trai-1" style="font-size:17px">Bé Trai</a></li>
+                                        <li><a class="list" href="/gioi-tinh/be-gai-2" style="font-size:17px">Bé Gái</a></li>
+                                        <li><a class="list" href="/gioi-tinh/tat-ca-3" style="font-size:17px">Tất Cả </a></li>
+                                    </ul>
+                                </div>
+                                @*<div class="col-sm-8 menu-grids">
+                                    <a href="products.html">
+                                        <div class="new-add">
+                                            <h5>30% OFF <br> Today Only</h5>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="clearfix"> </div>*@
+                            </div>
+                        </ul>
+                    </li>
+                    <li class="dropdown grid">
+                        <a href="#" class="dropdown-toggle list1" data-toggle="dropdown">Độ Tuổi<b class="caret"></b></a>
+                        <ul class="dropdown-menu multi-column menu-two multi-column3">
+                            <div class="row">
+                                <div class="col-sm-4 menu-grids">
+                                    <ul class="multi-column-dropdown">
+                                        @foreach (var item in ages)
+                                        {
+                                            <li><a class="list" href="/do-tuoi/@item.SEOKeyword-@item.ID" style="font-size:17px">@item.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                                @*<div class="col-sm-8 menu-grids">
+                                    <a href="products.html">
+                                        <div class="new-add">
+                                            <h5>30% OFF <br> Today Only</h5>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="clearfix"> </div>*@
+                            </div>
+                        </ul>
+                    </li>
+                    <li class="dropdown grid">
+                        <a href="#" class="dropdown-toggle list1" data-toggle="dropdown">Thương Hiệu <b class="caret"></b></a>
+                        <ul class="dropdown-menu multi-column multi-column4">
+                            <div class="row">
+                                <div class="col-sm-4 menu-grids">
+                                    <ul class="multi-column-dropdown">
+                                        @foreach (var item in producers)
+                                        {
+                                            <li><a class="list" href="/thuong-hieu/@item.SEOKeyword-@item.ID" style="font-size:17px">@item.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                                @*<div class="col-sm-8 menu-grids">
+                                    <a href="products.html">
+                                        <div class="new-add">
+                                            <h5>30% OFF <br> Today Only</h5>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="clearfix"> </div>*@
+                            </div>
+                        </ul>
+                    </li>
+                    <li><a href="#">Giới Thiệu</a></li>
+                </ul>
+                <div class="clearfix"> </div>
+                <!--//navbar-collapse-->
+            </div>
+            <header class="cd-main-header">
+                <ul class="cd-header-buttons">
+                    <li><a class="cd-search-trigger" href="#cd-search"> <span></span></a></li>
+                </ul> <!-- cd-header-buttons -->
+            </header>
+            <!--//navbar-header-->
+        </nav>
+        <div id="cd-search" class="cd-search">
+            <form action="/Product/Search" method="get">
+                <input type="search" placeholder="Tìm kiếm..." name="keyword" required>
+            </form>
+        </div>
+    </div>
+</div>

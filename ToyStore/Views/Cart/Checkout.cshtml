@@ -1,0 +1,360 @@
+﻿@using HelperExtensionNameSpace
+@{
+    /**/
+
+    ViewBag.Title = "Giỏ Hàng";
+    Layout = "~/Views/Layout/HomeLayout.cshtml";
+}
+@{
+    List<SourceCode.Models.ItemCart> Cart = Session["Cart"] as List<SourceCode.Models.ItemCart>;
+    SourceCode.Models.User User = Session["User"] as SourceCode.Models.User;
+    List<SourceCode.Models.UserDiscountCode> userDiscountCodes = ViewBag.DiscountCodeDetailListByUser as List<SourceCode.Models.UserDiscountCode>;
+}
+<script src="~/Scripts/bootbox.js"></script>
+<link href="~/Content/css/font-awesome.css" rel="stylesheet" />
+<script>
+    $(document).ready(function (c) {
+        $(document).on('click', '.btnEdit', function () {
+            var id = $(this).val();
+            $('#modalUpdate').modal('show');
+            $.ajax({
+                url: '/Cart/EditCart',
+                data: {
+                    id: id
+                },
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == true) {
+                        $('#btnSave').attr('data-id', response.ProductID);
+                        $('#Price').val(response.Price);
+                        $('#ProductID').val(response.ProductID);
+                        $('#Quantity').val(response.Quantity);
+                        $('#Image').attr('src', "/Content/images/" + response.Image);
+                    }
+                    else {
+                        bootbox.alert(response.message);
+                    }
+                },
+                error: function (err) {
+                    bootbox.alert("ds");
+                }
+            });
+        });
+        $(document).on('click', '.btnDelete', function () {
+            var id = $(this).val();
+            $.ajax({
+                url: '/Cart/RemoveItemCart',
+                type: 'GET',
+                data: {
+                    id: id
+                },
+                dataType: 'html',
+                success: function (result) {
+                    $('#DivCheckout').html(result);
+                    $.ajax({
+                        url: '/Cart/CartPartial',
+                        type: 'GET',
+                        dataType: 'html',
+                        success: function (result) {
+                            $('#DivCart').html(result);
+                            $.notify("Xóa sản phẩm trong giỏ hàng thành công!", "success");
+                        },
+                        error: function (err) {
+                            $.notify("Opps có lỗi xảy ra, vui lòng thử lại sau!", "error");
+                        }
+                    });
+                },
+                error: function (err) {
+                    bootbox.alert("ds");
+                }
+            });
+        });
+        $(document).on('click', '#btnChoose', function () {
+            $('#modalChoose').modal('show');
+        });
+        $('.Save').click(function (e) {
+            var id = $(this).attr("data-id");
+            var quantity = $("#Quantity").val();
+            if (quantity == "") {
+                $.notify("Vui lòng nhập vào số lượng sản phẩm!", "warn");
+                return;
+            }
+            if (quantity > 0) {
+                $.ajax({
+                    method: "POST",
+                    url: "/Cart/CheckQuantityUpdate",
+                    data: {
+                        ID: id,
+                        Quantity: quantity
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == true) {
+                            $.ajax({
+                                method: "POST",
+                                url: "/Cart/EditCart",
+                                data: {
+                                    ID: id,
+                                    Quantity: quantity
+                                },
+                                success: function (response) {
+                                    $.notify("Cập nhật giỏ hàng thành công!", "success");
+                                    window.setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500);
+                                }
+                            });
+                        }
+                        else {
+                            $.notify("Số lượng sản phẩm không đủ!", "error");
+                        }
+                    }
+                });
+            }
+            else {
+                $.notify("Số lượng phải lớn hơn 0!", "error");
+            }
+        });
+    });
+</script>
+<!--breadcrumbs-->
+<div class="breadcrumbs">
+    <div class="container">
+        <ol class="breadcrumb breadcrumb1 animated wow slideInLeft" data-wow-delay=".5s">
+            <li><a href="@Url.Action("Index","Home")"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>Trang Chủ</a></li>
+            <li class="active">Xem Giỏ Hàng</li>
+        </ol>
+    </div>
+</div>
+<!--//breadcrumbs-->
+<!--cart-items-->
+<div class="cart-items">
+    <div class="container" id="DivCheckout">
+        @if (Cart != null && Cart.Count > 0)
+        {
+            <h3 class="wow fadeInUp animated" data-wow-delay=".5s">Giỏ Hàng Của Bạn Có: @ViewBag.TotalQuantity Sản Phẩm</h3>
+            foreach (var item in Cart)
+            {
+                <div class="cart-header wow fadeInUp animated" data-wow-delay=".5s">
+                    <div style="text-align:right">
+                        <button class="btn btn-group btnEdit" value="@item.ProductID">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btnDelete" value="@item.ProductID">
+                            <i class="fa fa-close"></i>
+                        </button>
+                    </div>
+                    <div class="cart-sec simpleCart_shelfItem">
+                        <div class="cart-item cyc">
+                            <a href="/san-pham/@item.Product.SEOKeyword-@item.ProductID"><img src="@Url.Content("~/Content/images/" + item.Image)" class="img-responsive" alt=""></a>
+                        </div>
+                        <div class="cart-item-info">
+                            <h4><a href="single.html"> @item.Name </a></h4>
+                            <ul class="qty">
+                                <li><p>Số lượng:@item.Quantity</p></li>
+                                <li><p>Đơn giá: @item.Price.ToString("#,##")₫</p></li>
+                                <li><p>Thành tiền: @item.Total.ToString("#,##")₫</p></li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            }
+            if (Session["User"] == null)
+            {
+                <div class="login-page">
+                    <div class="title-info wow fadeInUp animated" data-wow-delay=".5s">
+                        <h3 class="title">Đặt Hàng Không Đăng Nhập</h3>
+                    </div>
+                    <div class="widget-shadow">
+                        <div class="login-top wow fadeInUp animated" data-wow-delay=".7s">
+                            <h4>Thông tin đơn đặt hàng</h4>
+                        </div>
+                        <div class="login-body wow fadeInUp animated" data-wow-delay=".7s">
+                            @using (Html.BeginForm("AddOrder", "Cart", FormMethod.Post))
+                            {
+                                <input type="text" class="user" name="FullName" placeholder="Họ tên" required maxlength="30">
+                                <input type="text" name="PhoneNumber" class="user" placeholder="Số điện thoại" pattern=".{10,12}" required title="Số điện thoại phải từ 10 đến 12 số!">
+                                <input type="text" name="Email" class="user" placeholder="Email" required pattern="[a-z0-9._%+-]+&#64;[a-z0-9.-]+\.[a-z]{2,}$" title="Nhập vào đúng đinh dạng mail của bạn (vd: abc@gmail.com)">
+                                <input type="text" name="Address" class="user" placeholder="Địa chỉ nhận hàng" required maxlength="200">
+                                if (Session["num"] != null)
+                                {
+                                    <label>Mã giảm giá</label><br />
+                                    <input type="text" name="NumberDiscount" class="user" value="@Session["Code"] (-@Session["num"]%)" readonly>
+                                    <input type="text" name="NumberDiscountPass" hidden="hidden" value="@Session["num"]">
+                                    <input type="text" name="CodePass" hidden="hidden" value="@Session["Code"]">
+                                    <input type="button" value="Chọn mã Code khác" id="btnChoose" />
+                                    @Html.ActionLink("Bỏ chọn mã giảm giá", "CancelDiscount")<br />
+                                    decimal total = @Cart.Sum(x => x.Total) - (@Cart.Sum(x => x.Total) / 100 * (int)@Session["num"]);
+                                    <select name="payment">
+                                        <option value="cod">Thanh toán khi nhận hàng(COD)</option>
+                                        <option value="paypal">Thanh toán qua Paypal</option>
+                                        <option value="momo">Thanh toán qua Momo</option>
+                                    </select><br />
+                                    <label>Thành tiền</label><br />
+                                    <del>@Cart.Sum(x => x.Total).ToString("#,##")₫</del>
+                                    <h4 style="color:brown">@total.ToString("#,##")₫</h4>
+                                }
+                                else
+                                {
+                                    <label>Mã giảm giá (nếu có)</label><br />
+                                    <input type="button" value="Chọn mã Code" id="btnChoose" /><br />
+                                    if (TempData["Message"] != null)
+                                    {
+                                        <p class="text text-danger">@TempData["Message"].ToString()</p>
+                                        TempData["Message"] = null;
+                                    }
+                                    <select name="payment">
+                                        <option value="cod">Thanh toán khi nhận hàng(COD)</option>
+                                        <option value="paypal">Thanh toán qua Paypal</option>
+                                        <option value="momo">Thanh toán qua Momo</option>
+                                    </select> <br />
+                                    <label>Thành tiền</label>
+                                    <h4 style="color:brown">@Cart.Sum(x => x.Total).ToString("#,##")₫</h4>
+                                }
+                                <input type="submit" name="Sign In" value="Tiến Hành Đặt Hàng">
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="login-page">
+                    <div class="title-info wow fadeInUp animated" data-wow-delay=".5s">
+                        <h3 class="title">Thông Tin Đặt Hàng</h3>
+                    </div>
+                    <div class="widget-shadow">
+                        <div class="login-body wow fadeInUp animated" data-wow-delay=".7s">
+                            @using (Html.BeginForm("AddOrder", "Cart", FormMethod.Post))
+                            {
+                                <label>Họ tên</label>
+                                <input type="text" class="user" name="FullName" value="@User.FullName" readonly>
+                                <label>Số điện thoại</label>
+                                <input type="text" name="PhoneNumber" class="user" value="@User.PhoneNumber" readonly>
+                                <label>Email</label>
+                                <input type="text" name="Email" class="user" value="@User.Email" readonly>
+                                <label>Địa chỉ nhận hàng</label>
+                                <input type="text" name="Address" class="user" value="@User.Address" readonly>
+                                if (Session["num"] != null)
+                                {
+                                    <label>Mã giảm giá</label><br />
+                                    <input type="text" name="NumberDiscount" class="user" value="@Session["Code"] (-@Session["num"]%)" readonly>
+                                    <input type="text" name="NumberDiscountPass" hidden="hidden" value="@Session["num"]">
+                                    <input type="text" name="CodePass" hidden="hidden" value="@Session["Code"]">
+                                    <input type="button" value="Chọn mã Code khác" id="btnChoose" />
+                                    @Html.ActionLink("Bỏ chọn mã giảm giá", "CancelDiscount")<br />
+                                    decimal total = @Cart.Sum(x => x.Total) - (@Cart.Sum(x => x.Total) / 100 * (int)@Session["num"]);
+                                    <select name="payment">
+                                        <option value="cod">Thanh toán khi nhận hàng(COD)</option>
+                                        <option value="paypal">Thanh toán qua Paypal</option>
+                                        <option value="momo">Thanh toán qua Momo</option>
+                                    </select> <br />
+                                    <label>Thành tiền</label><br />
+                                    <del>@Cart.Sum(x => x.Total).ToString("#,##")₫</del>
+                                    <h4 style="color:brown">@total.ToString("#,##")₫</h4>
+                                }
+                                else
+                                {
+                                    <label>Mã giảm giá (nếu có)</label><br />
+                                    <input type="button" value="Chọn mã Code" id="btnChoose" /><br />
+                                    if (TempData["Message"] != null)
+                                    {
+                                        <p class="text text-danger">@TempData["Message"].ToString()</p>
+                                        TempData["Message"] = null;
+                                    }
+                                    <select name="payment">
+                                        <option value="cod">Thanh toán khi nhận hàng(COD)</option>
+                                        <option value="paypal">Thanh toán qua Paypal</option>
+                                        <option value="momo">Thanh toán qua Momo</option>
+                                    </select> <br />
+                                    <label>Thành tiền</label>
+                                    <h4 style="color:brown">@Cart.Sum(x => x.Total).ToString("#,##")₫</h4>
+                                }
+                                <input type="submit" name="Sign In" value="Tiến Hành Đặt Hàng">
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <h3 class="wow fadeInUp animated" data-wow-delay=".5s">Giỏ Hàng Của Bạn Hiện Đang Trống</h3>
+        }
+    </div>
+</div>
+<!--//cart-items-->
+<div class="modal fade" id="modalUpdate" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chỉnh sửa</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="Name">Mã sản phẩm:</label>
+                    <input type="text" class="form-control" name="ProductID" id="ProductID" readonly="readonly">
+                </div>
+                <div class="form-group">
+                    <label>Hình ảnh:</label>
+                    <img name="Image" id="Image" style="height:200px;width:200px" />
+                </div>
+                <div class="form-group">
+                    <label for="Name">Đơn giá:</label>
+                    <input type="text" class="form-control" name="Price" id="Price" readonly="readonly">
+                </div>
+                <div class="form-group">
+                    <label for="Name">Số lượng:</label>
+                    <input type="number" class="form-control" name="Quantity" id="Quantity" min="1" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary Save" id="btnSave">Lưu</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalChoose" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chọn mã giảm giá</h4>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Choose", "Cart", FormMethod.Post))
+                {
+                    if (userDiscountCodes != null)
+                    {
+                        <div class="form-group">
+                            <label>Mã giảm giá của bạn:</label>
+                            @*@Html.DropDownList("Code", null, new { @class = "form-control" })*@
+                            <select class="form-control" name="Code">
+                                @foreach (var item in userDiscountCodes)
+                                {
+                                    <option value="@item.DiscountCodeDetail.Code">Mã: @item.DiscountCodeDetail.Code (Giảm @item.DiscountCodeDetail.DiscountCode.NumberDiscount% - Ngày hết hạn: @item.DiscountCodeDetail.DiscountCode.ExpirationDate.Value.ToShortDateString())</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label for="Name">Nhập mã tại đây:</label>
+                        <input type="text" class="form-control" name="CodeInput" id="Code">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="btnSave">Chọn</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

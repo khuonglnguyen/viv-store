@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "Trang Quản Trị - Trang Chủ";
+    Layout = "~/Views/Layout/AdminLayout.cshtml";
+}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="index.html">Home</a> <i class="fa fa-angle-right"></i></li>
+</ol>
+<!--four-grids here-->
+<div class="four-grids">
+    <div class="col-md-3 four-grid">
+        <div class="four-agileits">
+            <div class="icon">
+                <i class="glyphicon glyphicon-eye-open" aria-hidden="true"></i>
+            </div>
+            <div class="four-text">
+                <h3>Truy Cập Hiện Tại</h3>
+                <h4> @ViewBag.RealAccessTimes  </h4>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3 four-grid">
+        <div class="four-agileinfo">
+            <div class="icon">
+                <i class="glyphicon glyphicon-globe" aria-hidden="true"></i>
+            </div>
+            <div class="four-text">
+                <h3>Tổng Truy Cập</h3>
+                <h4>@ViewBag.SumAccessTimes</h4>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3 four-grid">
+        <div class="four-w3ls">
+            <div class="icon">
+                <i class="glyphicon glyphicon-signal" aria-hidden="true"></i>
+            </div>
+            <div class="four-text">
+                <h3>Doanh Thu</h3>
+                <h4>@ViewBag.TotalRevenue</h4>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3 four-grid">
+        <div class="four-wthree">
+            <div class="icon">
+                <i class="glyphicon glyphicon-list-alt" aria-hidden="true"></i>
+            </div>
+            <div class="four-text">
+                <h3>Đơn Hàng</h3>
+                <h4>@ViewBag.TotalOrder</h4>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--//four-grids here-->
