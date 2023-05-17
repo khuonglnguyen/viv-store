@@ -444,7 +444,7 @@ namespace SourceCode.Controllers
             }
 
 
-            SentMail("Đặt hàng thành công", user.Email, "khuongip564gb@gmail.com", "google..khuongip564gb", "<p style=\"font-size:20px\">Cảm ơn bạn đã đặt hàng<br/>Mã đơn hàng của bạn là: " + order.ID);
+            SentMail("Đặt hàng thành công", user.Email, "khuongip564gb@gmail.com", "cjwbneedakkwoxnb", "<p style=\"font-size:20px\">Cảm ơn bạn đã đặt hàng<br/>Mã đơn hàng của bạn là: " + order.ID);
 
 
 

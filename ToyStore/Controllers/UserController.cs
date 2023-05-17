@@ -158,14 +158,14 @@ namespace SourceCode.Controllers
             //string email = _userService.GetByID(ID).Email;
             //ViewBag.Email = "Mã xác minh đã được gửi đến: " + email;
             //_userService.UpdateCapcha(ID, captcha);
-            //SentMail("Mã xác minh tài khoản SourceCode", email, "khuongip564gb@gmail.com", "google..khuongip564gb", "<p>Mã xác minh của bạn: " + captcha + "<br/>Hoặc xác minh nhanh bằng cách click vào link: " + urlBase + "/User/ConfirmEmailLink/" + ID + "?Capcha=" + captcha + "</p>");
+            //SentMail("Mã xác minh tài khoản SourceCode", email, "khuongip564gb@gmail.com", "cjwbneedakkwoxnb", "<p>Mã xác minh của bạn: " + captcha + "<br/>Hoặc xác minh nhanh bằng cách click vào link: " + urlBase + "/User/ConfirmEmailLink/" + ID + "?Capcha=" + captcha + "</p>");
             //return View();
             User user = _userService.GetByID(ID);
             ViewBag.Message = "EmailConfirmed";
             //Gift
             _userDiscountCodeService.GiftForNewUser(user.ID);
             UsersSpin usersSpin = new UsersSpin();
-            usersSpin.NumberOfSpins = 0;
+            usersSpin.NumberOfSpins = 1;
             usersSpin.UserID = user.ID;
             _usersSpinService.Add(usersSpin);
             return View();

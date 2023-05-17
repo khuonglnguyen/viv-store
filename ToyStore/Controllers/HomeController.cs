@@ -160,15 +160,14 @@ namespace SourceCode.Controllers
                             role = role.Substring(0, role.Length - 1);
                             Decentralization(userCheck.ID, role);
                         }
-                        
+
 
                         if (_cartService.CheckCartUser(userCheck.ID))
                         {
                             List<ItemCart> carts = _cartService.GetCart(userCheck.ID);
                             Session["Cart"] = carts;
-                            return RedirectToAction("Index");
                         }
-                        if (Session["Cart"] != null)
+                        else if (Session["Cart"] != null)
                         {
                             List<ItemCart> listCart = Session["Cart"] as List<ItemCart>;
                             foreach (var item in listCart)
@@ -177,6 +176,11 @@ namespace SourceCode.Controllers
                                 _cartService.AddCartIntoUser(item);
                             }
                         }
+                    }
+
+                    if (userCheck.UserType.ID == 1)
+                    {
+                        return Redirect("/Admin");
                     }
                 }
                 else
